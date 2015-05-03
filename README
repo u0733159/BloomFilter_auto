@@ -1,1 +1,5 @@
-This is a git repository made by Rui Liu. This program is based on class CSCE438. All work is done by RUi LIu, expcet the bloom filter was imported from the link given by the instructor. 
+This is a git repository made by Rui Liu. This program is based on class CSCE438. All work is done by Rui Liu, expcet the bloom filter was imported from the link given by the instructor. 
+
+This auto parts filter does not work perfectly, but it can filter most auto parts listed in the given file. 
+
+If you want to test any files, please make sure each sentence is seperated by a space. 
