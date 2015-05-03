@@ -42,8 +42,6 @@ class BloomFilter:
     ## Detect the auto parts in each sentence, sentence here is a list of string;
     ## auto parts is replaced with ****, and the output is appended to the filtered_auto list    
     def sentence_auto_detector(self, sentence):
-        print("Sentence in detector is: \n");
-        print(sentence);
         newstring = '';
         if len(sentence) == 1:
            ss = sentence[0][:-1];
@@ -69,9 +67,7 @@ class BloomFilter:
            if self.lookup(ss) == "Probably":
                 newstring = newstring + sentence[0] + sentence[1];
                 self.filtered_auto.append(newstring);
-        print len(sentence);
         if len(sentence) >= 3:
-            print("Enter sentence bigger than 3\n");
             i = 0;
             tri_exist = False;
             big_exist = False;
@@ -83,7 +79,6 @@ class BloomFilter:
                 if (i + 3) <= len(sentence):
                     trigram = sentence[i:(i+3)];
                     trigram_string = sentence[i] + sentence[i+1] + sentence[i+2].strip();
-                    print(trigram_string);
                     tri_exist = True;
                 if (i + 2) <= len(sentence):
                     bigram = sentence[i:(i+2)];
@@ -93,7 +88,6 @@ class BloomFilter:
                     unigram = sentence[i];
                     unigram_string = sentence[i].strip();
                     uni_exist = True;
-                    #print("unigram");
                     
                 if tri_exist | big_exist | uni_exist:
                     if tri_exist == True:
@@ -108,28 +102,28 @@ class BloomFilter:
                             i = i + 1;
                         if self.lookup(trigram_string) == "Nope" and self.lookup(bigram_string) == "Nope" and self.lookup(unigram_string) == "Nope":
                             newsentence = newsentence + trigram[0];
-                            print(newsentence);
                             i = i + 1;
                     if tri_exist == False and big_exist == True:
                         if self.lookup(bigram_string) == "Probably":
-                            newsentence =newsentence + "****" + bigram[1][len(bigram[1])-1];
+                            #newsentence =newsentence + "****" + bigram[1][len(bigram[1])-1];
+                            newsentence =newsentence + "****";
                             i = i+2;
                         if self.lookup(bigram_string) == "Nope" and self.lookup(unigram_string) == "Probably":
-                            newsentence = newsentence + "****" + unigram[len(unigram)-1] +bigram[1];
+                            newsentence = newsentence + "****" + unigram[len(unigram)-1];
                             i = i + 1;
                         if self.lookup(bigram_string) == "Nope" and self.lookup(unigram_string) == "Nope":
-                            newsentence = newsentence + bigram[0] + bigram[1];
-                            i = i + 1;
+                             newsentence = newsentence + bigram[0];
+                             i = i + 1;
                     if tri_exist == False and big_exist == False and uni_exist == True:
                         if self.lookup(unigram_string) == "Probably":
-                            newsentence = newsentence + "****" + unigram[0][len(unigram[0])-1];
-                            #i = i + 1;
+                            newsentence = newsentence + "****";
+                        else:
+                            newsentence = newsentence + unigram;
                         i = i + 1;
                 tri_exist = False;
                 big_exist = False;
                 uni_exist = False;
             newsentence = newsentence + sign;
-            print("newsentence is: ");
             print(newsentence);
             self.filtered_auto.append(newsentence);
 
@@ -143,8 +137,6 @@ class BloomFilter:
                 wordList.append(word)
                 wordCount += 1
         sentences = [];
-        print("word list is: ");
-        print(wordList);
         s = [];
         signs = ['.', ',', '?', '!', ';', ':']
         flag = True;
@@ -156,33 +148,28 @@ class BloomFilter:
                 sentences.append(s);
                 s = [];
         filecontent.close();
-        print("sentences is :");
-        print(sentences);
         return sentences;
 
     ##Return a list of strings, this list should has no auto parts after using this function.
     def autoDetector(self, filename):
-        print("Enter autoDetector function:\n");
         content = self.parseText(filename);
-        print("Content is: \n");
-        print content;
-        output_content = [];
+        output_content1 = filename.strip(".txt") + "-output.txt";
+        output_content = "t" + output_content1;
         for i in range(0, len(content)):
             self.sentence_auto_detector(content[i]);
-        print("Result is:");
-        print(self.filtered_auto);
-        print output_content;
-
-
-
-bf = BloomFilter(500000, 7);
+        outfile = open(output_content, 'w');
+        for i in range(0, len(self.filtered_auto)):
+            outfile.write(self.filtered_auto[i]);
+        outfile.close();
+        
+bf = BloomFilter(20000, 5);
 autofile = open('auto-words.txt');
 
 for line in autofile:
     bf.add(line[0:(len(line) - 1)])
 autofile.close();
 
-bf.autoDetector("test2.txt");
+bf.autoDetector("test-paragraph.txt");
 
 
 
